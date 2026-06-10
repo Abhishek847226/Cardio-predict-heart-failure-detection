@@ -1,0 +1,14 @@
+{
+  "appId": "com.healthapp.heartfailurepredictor",
+  "appName": "Heart Failure Predictor",
+  "webDir": ".",
+  "cordova": {
+    "preferences": {
+      "DisallowOverscroll": "true",
+      "android-minSdkVersion": "24",
+      "android-targetSdkVersion": "33",
+      "Orientation": "portrait",
+      "Fullscreen": "false"
+    }
+  }
+}

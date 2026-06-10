@@ -1,0 +1,35 @@
+{
+  "name": "heart-failure-predictor",
+  "version": "1.0.0",
+  "description": "Heart Failure Risk Predictor - Android App",
+  "main": "index.js",
+  "scripts": {
+    "build": "cordova build android",
+    "build:release": "cordova build android --release",
+    "run": "cordova run android",
+    "clean": "cordova clean"
+  },
+  "keywords": [
+    "health",
+    "heart",
+    "predictor",
+    "android"
+  ],
+  "author": "Health App Team",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/android": "^8.0.1",
+    "@capacitor/cli": "^8.0.1",
+    "@capacitor/core": "^8.0.1",
+    "cordova-android": "^12.0.0"
+  },
+  "devDependencies": {
+    "cordova": "^12.0.0"
+  },
+  "cordova": {
+    "platforms": [
+      "android"
+    ],
+    "plugins": {}
+  }
+}

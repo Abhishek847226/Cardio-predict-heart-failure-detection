@@ -1,0 +1,88 @@
+{
+  "algorithm": "Logistic Regression",
+  "framework": "scikit-learn",
+  "accuracy": 0.8913628756457833,
+  "precision": 0.8271696252465484,
+  "recall": 0.9866196147625349,
+  "f1_score": 0.8998860054985584,
+  "auc_score": 0.9389576185073872,
+  "cv_mean": 0.8884749498383178,
+  "cv_std": 0.001754355505559525,
+  "confusion_matrix": [
+    [
+      5540,
+      1402
+    ],
+    [
+      91,
+      6710
+    ]
+  ],
+  "feature_names": [
+    "age",
+    "gender",
+    "bmi",
+    "systolic_bp",
+    "diastolic_bp",
+    "cholesterol",
+    "blood_sugar",
+    "diabetes",
+    "family_history",
+    "previous_heart_problems",
+    "smoking",
+    "physical_activity"
+  ],
+  "n_training_samples": 54968,
+  "n_test_samples": 13743,
+  "model_intercept": -2.517611011612847,
+  "feature_importance": [
+    {
+      "Feature": "previous_heart_problems",
+      "Coefficient": 4.995801529412626
+    },
+    {
+      "Feature": "blood_sugar",
+      "Coefficient": -0.7332786359047406
+    },
+    {
+      "Feature": "diabetes",
+      "Coefficient": 0.48364896318993505
+    },
+    {
+      "Feature": "systolic_bp",
+      "Coefficient": 0.4817893151307188
+    },
+    {
+      "Feature": "age",
+      "Coefficient": 0.3113794291213679
+    },
+    {
+      "Feature": "diastolic_bp",
+      "Coefficient": 0.15094822337846522
+    },
+    {
+      "Feature": "bmi",
+      "Coefficient": 0.13674317084351287
+    },
+    {
+      "Feature": "physical_activity",
+      "Coefficient": -0.10618749162926763
+    },
+    {
+      "Feature": "family_history",
+      "Coefficient": -0.09643358520007862
+    },
+    {
+      "Feature": "cholesterol",
+      "Coefficient": 0.069186749290452
+    },
+    {
+      "Feature": "smoking",
+      "Coefficient": -0.017086141696258297
+    },
+    {
+      "Feature": "gender",
+      "Coefficient": -0.01463587692586983
+    }
+  ]
+}

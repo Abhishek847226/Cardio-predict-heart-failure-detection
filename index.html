@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self' data: https://ssl.gstatic.com https://fonts.googleapis.com https://fonts.gstatic.com 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' http: ws:;">
+    <meta name="description"
+        content="Heart Failure Prediction Tool - Assess your heart health risk using advanced machine learning algorithms">
+    <meta name="keywords" content="heart failure, health prediction, cardiovascular health, risk assessment">
+    <title>Heart Failure Risk Predictor | Advanced Health Assessment</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- ML Edition: extra styles for new elements (does not touch style.css) -->
+    <style>
+        /* Confidence score line inside the risk result panel */
+        .ml-confidence-line {
+            font-size: 0.82rem;
+            opacity: 0.85;
+            margin-top: 0.6rem;
+            position: relative;
+            z-index: 1;
+            color: inherit;
+            letter-spacing: 0.02em;
+        }
+        /* Small pill badge on the Model Performance card */
+        .ml-status-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            background: rgba(16,185,129,0.15);
+            border: 1px solid rgba(16,185,129,0.4);
+            color: #10b981;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        /* Highlight row inside the model performance card */
+        .ml-stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.45rem 0.6rem;
+            background: rgba(15,23,42,0.4);
+            border-radius: 0.4rem;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+        }
+        .ml-stat-row span:last-child {
+            font-weight: 700;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Login Protection -->
+    <script>
+        // Check if user is logged in
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+    </script>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <div class="header-icon">❤️</div>
+                    <h1>Heart Failure Risk Predictor</h1>
+                    <p>Advanced machine learning-powered tool to assess your cardiovascular health risk. Enter your
+                        health
+                        information below to receive a personalized risk assessment and medical guidance.</p>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button onclick="window.location.href='change-password.html'"
+                        style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;">⚙️
+                        Settings</button>
+                    <button onclick="logout()"
+                        style="padding: 8px 16px; background: #e53e3e; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;">🚪
+                        Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <script>
+            function logout() {
+                if (confirm('Are you sure you want to logout?')) {
+                    sessionStorage.removeItem('isLoggedIn');
+                    sessionStorage.removeItem('loginTime');
+                    window.location.href = 'login.html';
+                }
+            }
+        </script>
+        </header>
+
+        <!-- Main Content Grid -->
+        <div class="main-grid">
+            <!-- Left Column: Input Form -->
+            <div class="form-section">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-icon">📋</span>
+                        <h2 class="card-title">Health Information</h2>
+                    </div>
+
+                    <form id="healthForm">
+                        <div class="form-grid">
+                            <!-- Age -->
+                            <div class="form-group">
+                                <label for="age">
+                                    Age <span class="required">*</span>
+                                </label>
+                                <input type="number" id="age" name="age" min="1" max="120" required
+                                    placeholder="Enter your age">
+                                <span class="input-hint">Years</span>
+                            </div>
+
+                            <!-- Gender -->
+                            <div class="form-group">
+                                <label for="gender">
+                                    Gender <span class="required">*</span>
+                                </label>
+                                <select id="gender" name="gender" required>
+                                    <option value="">Select gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+
+                            <!-- Systolic BP -->
+                            <div class="form-group">
+                                <label for="systolic">
+                                    Systolic Blood Pressure <span class="required">*</span>
+                                </label>
+                                <input type="number" id="systolic" name="systolic" min="70" max="250" required
+                                    placeholder="e.g., 120">
+                                <span class="input-hint">mmHg (Normal: 90-120)</span>
+                            </div>
+
+                            <!-- Diastolic BP -->
+                            <div class="form-group">
+                                <label for="diastolic">
+                                    Diastolic Blood Pressure <span class="required">*</span>
+                                </label>
+                                <input type="number" id="diastolic" name="diastolic" min="40" max="150" required
+                                    placeholder="e.g., 80">
+                                <span class="input-hint">mmHg (Normal: 60-80)</span>
+                            </div>
+
+                            <!-- Cholesterol -->
+                            <div class="form-group">
+                                <label for="cholesterol">
+                                    Total Cholesterol <span class="required">*</span>
+                                </label>
+                                <input type="number" id="cholesterol" name="cholesterol" min="100" max="400" required
+                                    placeholder="e.g., 200">
+                                <span class="input-hint">mg/dL (Normal: &lt;200)</span>
+                            </div>
+
+                            <!-- Blood Sugar -->
+                            <div class="form-group">
+                                <label for="bloodSugar">
+                                    Fasting Blood Sugar <span class="required">*</span>
+                                </label>
+                                <input type="number" id="bloodSugar" name="bloodSugar" min="50" max="400" required
+                                    placeholder="e.g., 100">
+                                <span class="input-hint">mg/dL (Normal: 70-100)</span>
+                            </div>
+
+                            <!-- BMI -->
+                            <div class="form-group">
+                                <label for="bmi">
+                                    Body Mass Index (BMI) <span class="required">*</span>
+                                </label>
+                                <input type="number" id="bmi" name="bmi" min="10" max="60" step="0.1" required
+                                    placeholder="e.g., 24.5">
+                                <span class="input-hint">kg/m² (Normal: 18.5-24.9)</span>
+                            </div>
+
+                            <!-- Physical Activity -->
+                            <div class="form-group">
+                                <label for="activity">
+                                    Physical Activity Level <span class="required">*</span>
+                                </label>
+                                <select id="activity" name="activity" required>
+                                    <option value="">Select activity level</option>
+                                    <option value="sedentary">Sedentary (Little to no exercise)</option>
+                                    <option value="light">Light (1-2 days/week)</option>
+                                    <option value="moderate">Moderate (3-5 days/week)</option>
+                                    <option value="active">Active (6-7 days/week)</option>
+                                    <option value="very-active">Very Active (Intense daily)</option>
+                                </select>
+                            </div>
+
+                            <!-- Diabetes -->
+                            <div class="form-group full-width">
+                                <label>
+                                    Do you have diabetes? <span class="required">*</span>
+                                </label>
+                                <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="diabetes" value="yes" required>
+                                        <span>Yes</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="diabetes" value="no" required>
+                                        <span>No</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="diabetes" value="prediabetes" required>
+                                        <span>Pre-diabetes</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Smoking -->
+                            <div class="form-group full-width">
+                                <label>
+                                    Smoking Status <span class="required">*</span>
+                                </label>
+                                <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="smoking" value="never" required>
+                                        <span>Never</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="smoking" value="former" required>
+                                        <span>Former Smoker</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="smoking" value="current" required>
+                                        <span>Current Smoker</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Family History -->
+                            <div class="form-group full-width">
+                                <label>
+                                    Family History of Heart Disease? <span class="required">*</span>
+                                </label>
+                                <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="familyHistory" value="yes" required>
+                                        <span>Yes</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="familyHistory" value="no" required>
+                                        <span>No</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="familyHistory" value="unknown" required>
+                                        <span>Unknown</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Previous Heart Issues -->
+                            <div class="form-group full-width">
+                                <label>
+                                    Previous Heart Issues? <span class="required">*</span>
+                                </label>
+                                <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="previousHeart" value="yes" required>
+                                        <span>Yes</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="previousHeart" value="no" required>
+                                        <span>No</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="form-group full-width">
+                                <button type="submit" class="btn btn-primary btn-full">
+                                    <span>🔍</span>
+                                    Analyze My Heart Health
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Results Section -->
+                <div id="resultsSection" class="results-section">
+                    <div class="card">
+                        <!-- Risk Indicator -->
+                        <div id="riskIndicator" class="risk-indicator">
+                            <div class="risk-icon" id="riskIcon">❤️</div>
+                            <div class="risk-level" id="riskLevel">Calculating...</div>
+                            <div class="risk-percentage" id="riskPercentage">Please wait...</div>
+                            <!-- ML Edition: confidence + accuracy line (populated by script.js) -->
+                            <div id="confidenceDisplay" class="ml-confidence-line" style="display:none;">
+                                <span id="confidenceText"></span>
+                            </div>
+                        </div>
+
+                        <!-- Risk Factors -->
+                        <div class="risk-factors" id="riskFactors">
+                            <h3>⚠️ Identified Risk Factors</h3>
+                            <div class="factors-list" id="factorsList">
+                                <!-- Dynamically populated -->
+                            </div>
+                        </div>
+
+                        <!-- Medical Advice -->
+                        <div class="advice-section">
+                            <h3>💡 Medical Recommendations</h3>
+                            <div class="advice-list" id="adviceList">
+                                <!-- Dynamically populated -->
+                            </div>
+                        </div>
+
+                        <!-- Emergency Alert (if needed) -->
+                        <div id="emergencyAlert" class="emergency-alert" style="display: none;">
+                            <h4>🚨 Urgent Medical Attention Required</h4>
+                            <p>Based on your health data, we strongly recommend consulting a healthcare professional
+                                immediately. Do not delay seeking medical care.</p>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <button onclick="window.print()" class="btn btn-secondary">
+                                <span>🖨️</span>
+                                Print Results
+                            </button>
+                            <button onclick="resetForm()" class="btn btn-secondary">
+                                <span>🔄</span>
+                                New Assessment
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Information Panel -->
+            <div class="info-panel">
+
+                <!-- ML Edition: Model Performance Card -->
+                <div class="info-card" id="modelInfoCard" style="background: linear-gradient(135deg, rgba(37,99,235,0.12), rgba(16,185,129,0.10)); border: 1px solid rgba(37,99,235,0.35);">
+                    <h3>🤖 ML Model Performance</h3>
+
+                    <!-- Server online/offline indicator -->
+                    <div style="margin-bottom:1rem; font-size:0.88rem; color:var(--text-muted);">
+                        Flask API Status: <span id="mlServerStatus" style="font-weight:600;">● Checking...</span>
+                    </div>
+
+                    <div class="ml-stat-row">
+                        <span>🧠 Algorithm</span>
+                        <span>Logistic Regression</span>
+                    </div>
+                    <div class="ml-stat-row">
+                        <span>🎯 Test Accuracy</span>
+                        <span id="mlAccuracy">Loading…</span>
+                    </div>
+                    <div class="ml-stat-row">
+                        <span>📉 AUC-ROC Score</span>
+                        <span id="mlAucScore">Loading…</span>
+                    </div>
+                    <div class="ml-stat-row">
+                        <span>📊 Training Samples</span>
+                        <span id="mlTrainSamples">Loading…</span>
+                    </div>
+                    <div class="ml-stat-row">
+                        <span>⚗️ Framework</span>
+                        <span>scikit-learn</span>
+                    </div>
+                </div>
+                <!-- End Model Performance Card -->
+
+                <div class="info-card">
+                    <h3>ℹ️ About This Tool</h3>
+                    <p>This advanced prediction tool uses machine learning algorithms to analyze your health data and
+                        assess your risk of heart failure. The system considers multiple factors including:</p>
+                    <div class="info-list">
+                        <div class="info-item">
+                            <span class="icon">📊</span>
+                            <span><strong>Vital Signs:</strong> Blood pressure, cholesterol, and blood sugar
+                                levels</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="icon">🏃</span>
+                            <span><strong>Lifestyle Factors:</strong> Physical activity, smoking status, and BMI</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="icon">🧬</span>
+                            <span><strong>Medical History:</strong> Diabetes, family history, and previous heart
+                                conditions</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="icon">🎯</span>
+                            <span><strong>Age & Gender:</strong> Demographic risk factors</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>🎯 Understanding Risk Levels</h3>
+                    <div class="info-list">
+                        <div class="info-item">
+                            <span class="icon" style="color: var(--success-color);">✅</span>
+                            <div>
+                                <strong>Low Risk (0-25%):</strong> Maintain healthy lifestyle habits and regular
+                                check-ups
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <span class="icon" style="color: var(--warning-color);">⚠️</span>
+                            <div>
+                                <strong>Moderate Risk (26-50%):</strong> Consider lifestyle changes and consult your
+                                doctor
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <span class="icon" style="color: var(--danger-color);">🔴</span>
+                            <div>
+                                <strong>High Risk (51-75%):</strong> Seek medical evaluation and follow treatment plan
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <span class="icon" style="color: var(--danger-color);">🚨</span>
+                            <div>
+                                <strong>Critical Risk (76-100%):</strong> Immediate medical attention strongly
+                                recommended
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>💪 Prevention Tips</h3>
+                    <div class="info-list">
+                        <div class="info-item">
+                            <span class="icon">🥗</span>
+                            <span>Eat a heart-healthy diet rich in fruits, vegetables, and whole grains</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="icon">🏃‍♂️</span>
+                            <span>Exercise regularly - aim for 150 minutes of moderate activity per week</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="icon">🚭</span>
+                            <span>Quit smoking and limit alcohol consumption</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="icon">😴</span>
+                            <span>Get adequate sleep (7-9 hours) and manage stress</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="icon">💊</span>
+                            <span>Take prescribed medications as directed by your doctor</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2026 Heart Failure Risk Predictor | Powered by Advanced Machine Learning</p>
+            <div class="disclaimer">
+                <strong>⚠️ Medical Disclaimer:</strong> This tool is for educational and informational purposes only. It
+                is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of
+                your physician or other qualified health provider with any questions you may have regarding a medical
+                condition. Never disregard professional medical advice or delay in seeking it because of something you
+                have read on this tool.
+            </div>
+        </footer>
+    </div>
+
+    <!-- Cordova JavaScript -->
+    <script src="cordova.js"></script>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+
+</html>
